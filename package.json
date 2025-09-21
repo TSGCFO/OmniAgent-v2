@@ -14,6 +14,7 @@
     "test:integration": "tsx src/test-integration.ts",
     "test:mcp": "tsx src/test-mcp-full.ts",
     "test:mcp-simple": "tsx src/test-mcp-simple.ts",
+    "test:intelligent": "tsx src/test-intelligent-mcp.ts",
     "example:resources": "tsx src/examples/mcp-resources-example.ts",
     "example:prompts": "tsx src/examples/mcp-prompts-example.ts",
     "quick-start": "tsx src/quick-start.ts"

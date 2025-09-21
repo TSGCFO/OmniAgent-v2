@@ -20,6 +20,7 @@ import {
   executeMCPPromptTool,
   compareMCPPromptsTool
 } from '../tools/mcp-prompt-tool.js';
+import { intelligentMCPHelperTool } from '../tools/intelligent-mcp-helper.js';
 
 // Main orchestrator agent instructions
 const MAIN_AGENT_INSTRUCTIONS = `You are OmniAgent, a unified AI assistant that serves as a single interface for managing all digital tasks across multiple platforms. Your role is to understand user requests, delegate to specialized sub-agents when needed, and provide personalized assistance based on learned patterns and preferences.
@@ -39,17 +40,23 @@ const MAIN_AGENT_INSTRUCTIONS = `You are OmniAgent, a unified AI assistant that 
 - **Web Search Agent**: Performs web searches and synthesizes information
 
 ## Intelligent MCP Usage:
-**ALWAYS check for relevant MCP resources and prompts before responding:**
-1. **For Information Requests**: First search MCP resources for documentation, guides, or data files
-2. **For Task Execution**: Check if there's an MCP prompt that provides a template for the task
-3. **For Integration Questions**: Look for MCP resources about available integrations
-4. **For Best Practices**: Search for prompts that encode proven approaches
+**IMPORTANT: Always use the intelligentMCPHelper tool FIRST for ANY user request!**
 
-Examples of when to use MCP capabilities:
-- User asks "How do I...?" → Search resources for documentation/guides
-- User asks "Can you help with Slack?" → Check for Slack-related prompts
-- User asks about capabilities → List available resources and prompts
-- User needs analysis → Look for analysis prompts to structure the response
+The intelligentMCPHelper will automatically:
+- Find relevant MCP resources and prompts based on the user's query
+- Provide suggestions on which resources/prompts to use
+- Give you relevance reasons for each finding
+
+After using intelligentMCPHelper:
+1. **If resources are found**: Read the most relevant ones using readMCPResource
+2. **If prompts are found**: Execute the most relevant one using executeMCPPrompt
+3. **Follow the suggestions**: The helper provides specific guidance for each query
+
+Manual MCP usage patterns:
+- User asks "How do I...?" → Resources will contain documentation/guides
+- User asks "Can you help with Slack?" → Prompts will include Slack-specific templates
+- User asks about capabilities → Both resources and prompts will be relevant
+- User needs analysis → Analysis prompts will be highlighted
 
 ## Interaction Guidelines:
 1. **Be Conversational**: Maintain a natural, helpful tone
@@ -91,6 +98,9 @@ export const mainAgent = new Agent({
       delegateTask: createDelegationTool(),
       searchMemory: createMemorySearchTool(),
       planTask: createTaskPlannerTool(),
+      
+      // Intelligent MCP helper (use this first!)
+      intelligentMCPHelper: intelligentMCPHelperTool,
       
       // MCP Resource tools
       listMCPResources: listMCPResourcesTool,
