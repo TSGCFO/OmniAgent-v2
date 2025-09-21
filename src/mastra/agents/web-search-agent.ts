@@ -1,10 +1,9 @@
 import { Agent } from '@mastra/core/agent';
 import { openai } from '@ai-sdk/openai';
+import { RuntimeContext } from '@mastra/core/runtime-context';
 import { getUnifiedMemory } from '../memory/memory-config.js';
 import { getSystemConfig } from '../config/system-config.js';
-import { createWebSearchTool } from '../tools/web-search-tool.js';
-import { createWebScrapeTool } from '../tools/web-scrape-tool.js';
-import { createSourceValidationTool } from '../tools/source-validation-tool.js';
+import { createDynamicToolLoader } from '../tools/mcp-tool-loader.js';
 
 const WEB_SEARCH_AGENT_INSTRUCTIONS = `You are the Web Search Agent, a specialized assistant for finding, analyzing, and synthesizing information from the internet.
 
@@ -55,14 +54,10 @@ export const webSearchAgent = new Agent({
   model: ({ runtimeContext }) => {
     const config = getSystemConfig();
     const model = runtimeContext?.get('model') || config.agents.subAgentModel;
-    return openai(model);
+    return openai(model as Parameters<typeof openai>[0]);
   },
   memory: getUnifiedMemory(),
-  tools: {
-    searchWeb: createWebSearchTool(),
-    scrapeWebPage: createWebScrapeTool(),
-    validateSource: createSourceValidationTool(),
-  },
+  tools: createDynamicToolLoader('web'),
   defaultGenerateOptions: ({ runtimeContext }) => {
     const config = getSystemConfig();
     return {
@@ -113,7 +108,15 @@ export async function performWebResearch(
         thread: `search-${userId}-${Date.now()}`,
         resource: userId,
       },
-      runtimeContext: context ? new Map(Object.entries(context)) : undefined,
+      runtimeContext: (() => {
+      const rc = new RuntimeContext();
+      if (context) {
+        Object.entries(context).forEach(([key, value]) => {
+          rc.set(key, value);
+        });
+      }
+      return rc;
+    })(),
     }
   );
   

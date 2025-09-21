@@ -1,10 +1,9 @@
 import { Agent } from '@mastra/core/agent';
 import { openai } from '@ai-sdk/openai';
+import { RuntimeContext } from '@mastra/core/runtime-context';
 import { getUnifiedMemory } from '../memory/memory-config.js';
 import { getSystemConfig } from '../config/system-config.js';
-import { createEmailSearchTool } from '../tools/email-search-tool.js';
-import { createEmailComposeTool } from '../tools/email-compose-tool.js';
-import { createEmailManageTool } from '../tools/email-manage-tool.js';
+import { createDynamicToolLoader } from '../tools/mcp-tool-loader.js';
 
 const EMAIL_AGENT_INSTRUCTIONS = `You are the Email Management Agent, a specialized assistant for handling all email-related tasks. You can search, read, compose, and organize emails efficiently.
 
@@ -41,14 +40,10 @@ export const emailAgent = new Agent({
   model: ({ runtimeContext }) => {
     const config = getSystemConfig();
     const model = runtimeContext?.get('model') || config.agents.subAgentModel;
-    return openai(model);
+    return openai(model as Parameters<typeof openai>[0]);
   },
   memory: getUnifiedMemory(),
-  tools: {
-    searchEmails: createEmailSearchTool(),
-    composeEmail: createEmailComposeTool(),
-    manageEmail: createEmailManageTool(),
-  },
+  tools: createDynamicToolLoader('email'),
   defaultGenerateOptions: ({ runtimeContext }) => {
     const config = getSystemConfig();
     return {
@@ -84,12 +79,19 @@ export async function processEmailRequest(
   userId: string,
   context?: EmailContext
 ) {
+  const runtimeContext = new RuntimeContext();
+  if (context) {
+    Object.entries(context).forEach(([key, value]) => {
+      runtimeContext.set(key, value);
+    });
+  }
+  
   const response = await emailAgent.generate(request, {
     memory: {
       thread: `email-${userId}-${Date.now()}`,
       resource: userId,
     },
-    runtimeContext: context ? new Map(Object.entries(context)) : undefined,
+    runtimeContext,
   });
   
   return response;

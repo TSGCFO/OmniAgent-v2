@@ -5,6 +5,7 @@ import { getSystemConfig } from '../config/system-config.js';
 import { createDelegationTool } from '../tools/delegation-tool.js';
 import { createMemorySearchTool } from '../tools/memory-search-tool.js';
 import { createTaskPlannerTool } from '../tools/task-planner-tool.js';
+import { loadMCPTools } from '../tools/mcp-tool-loader.js';
 
 // Main orchestrator agent instructions
 const MAIN_AGENT_INSTRUCTIONS = `You are OmniAgent, a unified AI assistant that serves as a single interface for managing all digital tasks across multiple platforms. Your role is to understand user requests, delegate to specialized sub-agents when needed, and provide personalized assistance based on learned patterns and preferences.
@@ -51,14 +52,22 @@ export const mainAgent = new Agent({
   model: ({ runtimeContext }) => {
     const config = getSystemConfig();
     const model = runtimeContext?.get('model') || config.agents.mainModel;
-    return openai(model);
+    return openai(model as Parameters<typeof openai>[0]);
   },
   memory: getUnifiedMemory(),
-  tools: {
-    // Core tools for the main agent
-    delegateTask: createDelegationTool(),
-    searchMemory: createMemorySearchTool(),
-    planTask: createTaskPlannerTool(),
+  tools: async ({ runtimeContext }) => {
+    // Load MCP tools dynamically
+    const mcpTools = await loadMCPTools();
+    
+    // Combine with core orchestration tools
+    return {
+      // Core tools for the main agent
+      delegateTask: createDelegationTool(),
+      searchMemory: createMemorySearchTool(),
+      planTask: createTaskPlannerTool(),
+      // Add all available MCP tools
+      ...mcpTools,
+    };
   },
   // Sub-agents will be dynamically accessed via delegation tool
   agents: async ({ runtimeContext }) => {

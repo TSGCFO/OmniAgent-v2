@@ -1,10 +1,9 @@
 import { Agent } from '@mastra/core/agent';
 import { openai } from '@ai-sdk/openai';
+import { RuntimeContext } from '@mastra/core/runtime-context';
 import { getUnifiedMemory } from '../memory/memory-config.js';
 import { getSystemConfig } from '../config/system-config.js';
-import { createCalendarViewTool } from '../tools/calendar-view-tool.js';
-import { createCalendarScheduleTool } from '../tools/calendar-schedule-tool.js';
-import { createCalendarManageTool } from '../tools/calendar-manage-tool.js';
+import { createDynamicToolLoader } from '../tools/mcp-tool-loader.js';
 
 const CALENDAR_AGENT_INSTRUCTIONS = `You are the Calendar Management Agent, a specialized assistant for scheduling, managing meetings, and optimizing time management.
 
@@ -48,14 +47,10 @@ export const calendarAgent = new Agent({
   model: ({ runtimeContext }) => {
     const config = getSystemConfig();
     const model = runtimeContext?.get('model') || config.agents.subAgentModel;
-    return openai(model);
+    return openai(model as Parameters<typeof openai>[0]);
   },
   memory: getUnifiedMemory(),
-  tools: {
-    viewCalendar: createCalendarViewTool(),
-    scheduleMeeting: createCalendarScheduleTool(),
-    manageCalendar: createCalendarManageTool(),
-  },
+  tools: createDynamicToolLoader('calendar'),
   defaultGenerateOptions: ({ runtimeContext }) => {
     const config = getSystemConfig();
     return {
@@ -102,12 +97,19 @@ export async function processCalendarRequest(
   userId: string,
   context?: CalendarContext
 ) {
+  const runtimeContext = new RuntimeContext();
+  if (context) {
+    Object.entries(context).forEach(([key, value]) => {
+      runtimeContext.set(key, value);
+    });
+  }
+  
   const response = await calendarAgent.generate(request, {
     memory: {
       thread: `calendar-${userId}-${Date.now()}`,
       resource: userId,
     },
-    runtimeContext: context ? new Map(Object.entries(context)) : undefined,
+    runtimeContext,
   });
   
   return response;

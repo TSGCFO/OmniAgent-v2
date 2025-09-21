@@ -5,6 +5,20 @@ export const createMCPClient = () => {
   // Check for environment variables to determine which servers to connect
   const servers: Record<string, any> = {};
   
+  // Rube MCP Server - Pre-built integrations with apps
+  if (process.env.RUBE_MCP_TOKEN) {
+    servers.rube = {
+      url: new URL('https://rube.app/mcp'),
+      requestInit: {
+        headers: {
+          'Authorization': `Bearer ${process.env.RUBE_MCP_TOKEN}`,
+        },
+      },
+    };
+  } else {
+    console.warn('RUBE_MCP_TOKEN not set - Rube MCP server will not be available');
+  }
+  
   // Weather MCP Server (example)
   if (process.env.MCP_WEATHER_SERVER_URL) {
     servers.weather = {
@@ -69,7 +83,7 @@ export const createMCPClient = () => {
   
   // Only create client if we have servers configured
   if (Object.keys(servers).length === 0) {
-    console.log('No MCP servers configured. Add server URLs to environment variables.');
+    console.log('No MCP servers configured. At minimum, set RUBE_MCP_TOKEN for app integrations.');
     return null;
   }
   

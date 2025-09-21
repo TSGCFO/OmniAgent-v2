@@ -1,5 +1,5 @@
 import { Memory } from '@mastra/memory';
-import { LibSQLStore, LibSQLVector } from '@mastra/libsql';
+import { PgStore, PgVector } from '@mastra/pg';
 import { fastembed } from '@mastra/fastembed';
 import { getSystemConfig } from '../config/system-config.js';
 import { createUnifiedMemoryProcessors } from './memory-processors.js';
@@ -56,15 +56,17 @@ export function createUnifiedMemory(): Memory {
   const config = getSystemConfig();
   
   // Create storage instances
-  const databaseUrl = process.env.DATABASE_URL || 'file:./data/omniagent.db';
-  const vectorUrl = process.env.VECTOR_DB_URL || 'file:./data/vector.db';
+  const postgresUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  if (!postgresUrl) {
+    throw new Error('POSTGRES_URL or DATABASE_URL environment variable is required');
+  }
   
-  const storage = new LibSQLStore({
-    url: databaseUrl,
+  const storage = new PgStore({
+    connectionString: postgresUrl,
   });
   
-  const vector = new LibSQLVector({
-    connectionUrl: vectorUrl,
+  const vector = new PgVector({
+    connectionString: postgresUrl,
   });
 
   // Create memory with comprehensive configuration
