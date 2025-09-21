@@ -66,6 +66,7 @@ ENABLE_WORKING_MEMORY=true
 # Optional: Memory configuration
 MEMORY_WORKING_SCOPE=resource
 MEMORY_SEMANTIC_RECALL_TOPK=5
+MEMORY_SEMANTIC_RECALL_MESSAGE_RANGE=2
 MEMORY_LAST_MESSAGES_COUNT=20
 ```
 
@@ -75,6 +76,21 @@ MEMORY_LAST_MESSAGES_COUNT=20
 2. Navigate to your account settings
 3. Generate an API token
 4. Add the token to your `.env` file as `RUBE_MCP_TOKEN`
+
+### 5. Memory Configuration Options
+
+The memory system can be fine-tuned with these environment variables:
+
+- **`MEMORY_WORKING_SCOPE`**: Determines the scope of working memory
+  - `thread`: Memory is isolated to individual conversation threads
+  - `resource`: Memory persists across all threads for the same user (default)
+
+- **`MEMORY_SEMANTIC_RECALL_TOPK`**: Number of semantically similar messages to retrieve (1-20, default: 5)
+
+- **`MEMORY_SEMANTIC_RECALL_MESSAGE_RANGE`**: Number of messages to include before and after each semantic match (0-10, default: 2)
+  - For example, with a value of 2, when a relevant message is found, it will include 2 messages before and 2 messages after it for context
+
+- **`MEMORY_LAST_MESSAGES_COUNT`**: Number of recent messages to include in conversation history (5-100, default: 20)
 
 ## Running the System
 
@@ -222,6 +238,79 @@ To see available tools:
 const { getMCPTools } = await import('./src/mastra/mcp/mcp-config.js');
 const tools = await getMCPTools();
 console.log('Available tools:', Object.keys(tools));
+```
+
+### Accessing MCP Resources
+
+MCP Resources allow servers to expose data and content (files, databases, API responses, etc.) that can be read by clients:
+
+```javascript
+// List all resources
+const { getMCPResources } = await import('./src/mastra/mcp/mcp-config.js');
+const resources = await getMCPResources();
+console.log('Available resources:', resources);
+
+// Read a specific resource
+const { readMCPResource } = await import('./src/mastra/mcp/mcp-config.js');
+const content = await readMCPResource('filesystem', 'file:///README.md');
+console.log('Resource content:', content);
+
+// Subscribe to resource updates
+const { subscribeMCPResource, onMCPResourceUpdated } = await import('./src/mastra/mcp/mcp-config.js');
+await onMCPResourceUpdated('filesystem', (params) => {
+  console.log(`Resource updated: ${params.uri}`);
+});
+await subscribeMCPResource('filesystem', 'file:///data.json');
+```
+
+### Accessing MCP Prompts
+
+MCP Prompts are reusable templates that servers expose for standardized LLM interactions:
+
+```javascript
+// List all prompts
+const { getMCPPrompts } = await import('./src/mastra/mcp/mcp-config.js');
+const prompts = await getMCPPrompts();
+console.log('Available prompts:', prompts);
+
+// Get and execute a specific prompt
+const { getMCPPrompt } = await import('./src/mastra/mcp/mcp-config.js');
+const promptData = await getMCPPrompt({
+  serverName: 'rube',
+  name: 'analysis-prompt',
+  args: { topic: 'market trends' }
+});
+console.log('Prompt messages:', promptData.messages);
+```
+
+### Using MCP Resources and Prompts with Agents
+
+The system includes tools that allow agents to access MCP resources and prompts:
+
+```javascript
+// Import the resource and prompt tools
+import { 
+  listMCPResourcesTool, 
+  readMCPResourceTool,
+  searchMCPResourcesTool 
+} from './src/mastra/tools/mcp-resource-tool.js';
+import { 
+  listMCPPromptsTool,
+  executeMCPPromptTool 
+} from './src/mastra/tools/mcp-prompt-tool.js';
+
+// Add to agent configuration
+const agent = new Agent({
+  // ... other config
+  tools: {
+    listResources: listMCPResourcesTool,
+    readResource: readMCPResourceTool,
+    searchResources: searchMCPResourcesTool,
+    listPrompts: listMCPPromptsTool,
+    executePrompt: executeMCPPromptTool,
+    // ... other tools
+  }
+});
 ```
 
 ### Database Migrations

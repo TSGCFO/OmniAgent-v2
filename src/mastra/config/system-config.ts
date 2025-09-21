@@ -6,6 +6,7 @@ export const SystemConfigSchema = z.object({
   memory: z.object({
     workingMemoryScope: z.enum(['thread', 'resource']).default('resource'),
     semanticRecallTopK: z.number().min(1).max(20).default(5),
+    semanticRecallMessageRange: z.number().min(0).max(10).default(2),
     lastMessagesCount: z.number().min(5).max(100).default(20),
     enableSemanticRecall: z.boolean().default(true),
     enableWorkingMemory: z.boolean().default(true),
@@ -34,6 +35,7 @@ export const defaultConfig: SystemConfig = {
   memory: {
     workingMemoryScope: 'resource',
     semanticRecallTopK: 5,
+    semanticRecallMessageRange: 2,
     lastMessagesCount: 20,
     enableSemanticRecall: true,
     enableWorkingMemory: true,
@@ -59,6 +61,9 @@ export function getSystemConfig(): SystemConfig {
       semanticRecallTopK: process.env.MEMORY_SEMANTIC_RECALL_TOPK 
         ? parseInt(process.env.MEMORY_SEMANTIC_RECALL_TOPK) 
         : defaultConfig.memory.semanticRecallTopK,
+      semanticRecallMessageRange: process.env.MEMORY_SEMANTIC_RECALL_MESSAGE_RANGE
+        ? parseInt(process.env.MEMORY_SEMANTIC_RECALL_MESSAGE_RANGE)
+        : defaultConfig.memory.semanticRecallMessageRange,
       lastMessagesCount: process.env.MEMORY_LAST_MESSAGES_COUNT
         ? parseInt(process.env.MEMORY_LAST_MESSAGES_COUNT)
         : defaultConfig.memory.lastMessagesCount,

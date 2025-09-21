@@ -118,7 +118,9 @@ export async function getMCPTools() {
   }
 }
 
-// Get MCP resources
+// ===== MCP Resources Functions =====
+
+// Get all available MCP resources from all servers
 export async function getMCPResources() {
   const client = await getMCPClient();
   if (!client) {
@@ -130,6 +132,148 @@ export async function getMCPResources() {
   } catch (error) {
     console.error('Failed to get MCP resources:', error);
     return {};
+  }
+}
+
+// Get resource templates from all servers
+export async function getMCPResourceTemplates() {
+  const client = await getMCPClient();
+  if (!client) {
+    return {};
+  }
+  
+  try {
+    return await client.resources.templates();
+  } catch (error) {
+    console.error('Failed to get MCP resource templates:', error);
+    return {};
+  }
+}
+
+// Read a specific resource from a server
+export async function readMCPResource(serverName: string, uri: string) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    return await client.resources.read(serverName, uri);
+  } catch (error) {
+    console.error(`Failed to read MCP resource ${uri} from ${serverName}:`, error);
+    throw error;
+  }
+}
+
+// Subscribe to resource updates
+export async function subscribeMCPResource(serverName: string, uri: string) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    return await client.resources.subscribe(serverName, uri);
+  } catch (error) {
+    console.error(`Failed to subscribe to MCP resource ${uri} from ${serverName}:`, error);
+    throw error;
+  }
+}
+
+// Unsubscribe from resource updates
+export async function unsubscribeMCPResource(serverName: string, uri: string) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    return await client.resources.unsubscribe(serverName, uri);
+  } catch (error) {
+    console.error(`Failed to unsubscribe from MCP resource ${uri} from ${serverName}:`, error);
+    throw error;
+  }
+}
+
+// Set up resource update handler
+export async function onMCPResourceUpdated(serverName: string, handler: (params: { uri: string }) => void) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    await client.resources.onUpdated(serverName, handler);
+  } catch (error) {
+    console.error(`Failed to set up resource update handler for ${serverName}:`, error);
+    throw error;
+  }
+}
+
+// Set up resource list change handler
+export async function onMCPResourceListChanged(serverName: string, handler: () => void) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    await client.resources.onListChanged(serverName, handler);
+  } catch (error) {
+    console.error(`Failed to set up resource list change handler for ${serverName}:`, error);
+    throw error;
+  }
+}
+
+// ===== MCP Prompts Functions =====
+
+// Get all available MCP prompts from all servers
+export async function getMCPPrompts() {
+  const client = await getMCPClient();
+  if (!client) {
+    return {};
+  }
+  
+  try {
+    return await client.prompts.list();
+  } catch (error) {
+    console.error('Failed to get MCP prompts:', error);
+    return {};
+  }
+}
+
+// Get a specific prompt with its messages
+export async function getMCPPrompt(params: {
+  serverName: string;
+  name: string;
+  args?: Record<string, any>;
+  version?: string;
+}) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    return await client.prompts.get(params);
+  } catch (error) {
+    console.error(`Failed to get MCP prompt ${params.name} from ${params.serverName}:`, error);
+    throw error;
+  }
+}
+
+// Set up prompt list change handler
+export async function onMCPPromptListChanged(serverName: string, handler: () => void) {
+  const client = await getMCPClient();
+  if (!client) {
+    throw new Error('MCP client not initialized');
+  }
+  
+  try {
+    await client.prompts.onListChanged(serverName, handler);
+  } catch (error) {
+    console.error(`Failed to set up prompt list change handler for ${serverName}:`, error);
+    throw error;
   }
 }
 

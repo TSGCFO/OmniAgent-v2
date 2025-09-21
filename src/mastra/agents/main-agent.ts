@@ -6,6 +6,20 @@ import { createDelegationTool } from '../tools/delegation-tool.js';
 import { createMemorySearchTool } from '../tools/memory-search-tool.js';
 import { createTaskPlannerTool } from '../tools/task-planner-tool.js';
 import { loadMCPTools } from '../tools/mcp-tool-loader.js';
+import { 
+  listMCPResourcesTool,
+  readMCPResourceTool,
+  searchMCPResourcesTool,
+  listMCPResourceTemplatesTool,
+  manageMCPResourceSubscriptionTool
+} from '../tools/mcp-resource-tool.js';
+import {
+  listMCPPromptsTool,
+  getMCPPromptTool,
+  findMCPPromptsTool,
+  executeMCPPromptTool,
+  compareMCPPromptsTool
+} from '../tools/mcp-prompt-tool.js';
 
 // Main orchestrator agent instructions
 const MAIN_AGENT_INSTRUCTIONS = `You are OmniAgent, a unified AI assistant that serves as a single interface for managing all digital tasks across multiple platforms. Your role is to understand user requests, delegate to specialized sub-agents when needed, and provide personalized assistance based on learned patterns and preferences.
@@ -16,14 +30,26 @@ const MAIN_AGENT_INSTRUCTIONS = `You are OmniAgent, a unified AI assistant that 
 3. **Memory Management**: Remember user preferences, patterns, and context across conversations
 4. **Context Awareness**: Maintain conversation flow and understand implicit references
 5. **Proactive Assistance**: Suggest relevant actions based on patterns and context
+6. **MCP Resource Access**: Read and search through files, databases, and other resources exposed by MCP servers
+7. **MCP Prompt Utilization**: Use pre-built prompts from MCP servers for specialized tasks
 
 ## Sub-Agents Available:
 - **Email Agent**: Manages email operations (reading, composing, searching, organizing)
 - **Calendar Agent**: Handles scheduling, meeting management, and time coordination
 - **Web Search Agent**: Performs web searches and synthesizes information
-- **Weather Agent**: Provides weather information and forecasts
-- **Project Agent**: Manages project tasks and coordination (Phase 2)
-- **Analytics Agent**: Provides insights and patterns from user data (Phase 2)
+
+## Intelligent MCP Usage:
+**ALWAYS check for relevant MCP resources and prompts before responding:**
+1. **For Information Requests**: First search MCP resources for documentation, guides, or data files
+2. **For Task Execution**: Check if there's an MCP prompt that provides a template for the task
+3. **For Integration Questions**: Look for MCP resources about available integrations
+4. **For Best Practices**: Search for prompts that encode proven approaches
+
+Examples of when to use MCP capabilities:
+- User asks "How do I...?" → Search resources for documentation/guides
+- User asks "Can you help with Slack?" → Check for Slack-related prompts
+- User asks about capabilities → List available resources and prompts
+- User needs analysis → Look for analysis prompts to structure the response
 
 ## Interaction Guidelines:
 1. **Be Conversational**: Maintain a natural, helpful tone
@@ -65,6 +91,21 @@ export const mainAgent = new Agent({
       delegateTask: createDelegationTool(),
       searchMemory: createMemorySearchTool(),
       planTask: createTaskPlannerTool(),
+      
+      // MCP Resource tools
+      listMCPResources: listMCPResourcesTool,
+      readMCPResource: readMCPResourceTool,
+      searchMCPResources: searchMCPResourcesTool,
+      listMCPResourceTemplates: listMCPResourceTemplatesTool,
+      manageMCPResourceSubscription: manageMCPResourceSubscriptionTool,
+      
+      // MCP Prompt tools
+      listMCPPrompts: listMCPPromptsTool,
+      getMCPPrompt: getMCPPromptTool,
+      findMCPPrompts: findMCPPromptsTool,
+      executeMCPPrompt: executeMCPPromptTool,
+      compareMCPPrompts: compareMCPPromptsTool,
+      
       // Add all available MCP tools
       ...mcpTools,
     };
