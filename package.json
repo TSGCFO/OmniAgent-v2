@@ -1,0 +1,39 @@
+{
+  "name": "omniagent-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "mastra dev",
+    "build": "mastra build",
+    "start": "mastra start",
+    "test:main": "tsx src/test-main-agent.ts",
+    "test:example": "tsx src/example-usage.ts",
+    "test:delegation": "tsx src/test-delegation.ts",
+    "quick-start": "tsx src/quick-start.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
+    "@mastra/core": "^0.17.1",
+    "@mastra/libsql": "^0.14.2",
+    "@mastra/loggers": "^0.10.12",
+    "@mastra/memory": "^0.15.2",
+    "@mastra/mcp": "latest",
+    "@mastra/fastembed": "latest",
+    "dotenv": "^16.4.7",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "mastra": "^0.13.1",
+    "typescript": "^5.9.2"
+  }
+}

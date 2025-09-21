@@ -1,0 +1,155 @@
+---
+alwaysApply: true
+---
+# Mastra Development Guidelines
+
+## CRITICAL: Always Use MCP Tools First
+
+### MCP TOOL USAGE REQUIREMENTS
+
+#### 1. CONTEXT FIRST — NO GUESSWORK
+
+- **DO NOT WRITE A SINGLE LINE OF CODE UNTIL YOU UNDERSTAND THE SYSTEM AND USE MCP TOOLS**
+- **IMMEDIATELY LIST FILES IN THE TARGET DIRECTORY**
+- **ASK ONLY THE NECESSARY CLARIFYING QUESTIONS. NO FLUFF**
+- **DETECT AND FOLLOW EXISTING PATTERNS. MATCH STYLE, STRUCTURE, AND LOGIC**
+- **IDENTIFY ENVIRONMENT VARIABLES, CONFIG FILES, AND SYSTEM DEPENDENCIES**
+
+#### 2. CHALLENGE THE REQUEST — DON'T BLINDLY FOLLOW
+
+- **IDENTIFY EDGE CASES IMMEDIATELY**
+- **ASK SPECIFICALLY: WHAT ARE THE INPUTS? OUTPUTS? CONSTRAINTS?**
+- **QUESTION EVERYTHING THAT IS VAGUE OR ASSUMED**
+- **REFINE THE TASK UNTIL THE GOAL IS BULLET-PROOF**
+
+#### 3. HOLD THE STANDARD — EVERY LINE MUST COUNT
+
+- **CODE MUST BE MODULAR, TESTABLE, CLEAN**
+- **COMMENT METHODS. USE DOCSTRINGS. EXPLAIN LOGIC**
+- **SUGGEST BEST PRACTICES IF CURRENT APPROACH IS OUTDATED**
+- **IF YOU KNOW A BETTER WAY — SPEAK UP**
+
+#### 4. ZOOM OUT — THINK BIGGER THAN JUST THE FILE
+
+- **DON'T PATCH. DESIGN**
+- **THINK ABOUT MAINTAINABILITY, USABILITY, SCALABILITY**
+- **CONSIDER ALL COMPONENTS (FRONTEND, BACKEND, DB, USER INTERFACE)**
+- **PLAN FOR THE USER EXPERIENCE. NOT JUST THE FUNCTIONALITY**
+
+Before performing ANY planning or implementation steps related to Mastra:
+
+1. **Search Mastra Documentation**
+   - Use the `mcp_mastra_mastraDocs` tool to explore relevant documentation
+   - Check both general docs and reference docs for the feature you're working on
+   - Example: For agents, check both `agents/` and `reference/agents/`
+   - Example: For workflows, check both `workflows/` and `reference/workflows/`
+   - Example: For RAG, check both `rag/` and `reference/rag/`
+
+2. **Review Mastra Examples**
+   - Use the `mcp_mastra_mastraExamples` tool to find relevant code examples
+   - Study the example implementations before writing any code
+   - Look for patterns and best practices in the examples
+   - Available examples include: agent, workflow-*, memory-*, rag examples, etc.
+
+3. **Check Changelogs When Needed**
+   - Use the `mcp_mastra_mastraChanges` tool for version-specific information
+   - Ensure you're using the latest features and APIs
+   - Check for breaking changes or new capabilities
+
+4. **Consult Blog for Updates**
+   - Use the `mcp_mastra_mastraBlog` tool for announcements and feature posts
+   - Check for recent updates that might affect your implementation
+
+## Implementation Process
+
+1. **Research Phase** (ALWAYS FIRST)
+   - Search docs for the feature/concept using `mcp_mastra_mastraDocs`
+   - Find and review relevant examples using `mcp_mastra_mastraExamples`
+   - Understand the proper patterns and APIs
+   - Check for any recent changes using `mcp_mastra_mastraChanges`
+
+2. **Planning Phase**
+   - Based on docs and examples, plan the implementation
+   - Reference specific documentation paths and example names
+   - Consider package dependencies and installation requirements
+
+3. **Implementation Phase**
+   - Follow patterns from official examples
+   - Use proper package imports (e.g., `@mastra/core`, `@mastra/agents`, `@mastra/workflows`)
+   - Install packages with `pnpm add <package>@latest`
+   - Follow TypeScript best practices with proper typing
+
+## Key Rules
+
+### MCP Tool Usage Requirements
+
+- **NEVER implement Mastra features without first consulting documentation via MCP tools**
+- **ALWAYS check examples for the correct implementation patterns using MCP tools**
+- **When displaying results, mention which documentation path or example was referenced**
+- **Provide code snippets from examples to illustrate proper usage**
+- **Always use the latest package versions unless specifically requested otherwise**
+
+### Documentation & Research
+
+- **Use `mcp_mastra_mastraDocs` tool to explore relevant documentation**
+- **Use `mcp_mastra_mastraExamples` tool to find relevant code examples**
+- **Use `mcp_mastra_mastraChanges` tool for version-specific information**
+- **Use `mcp_mastra_mastraBlog` tool for announcements and feature posts**
+
+### Code Quality & Standards
+
+- **Follow the established patterns for agents, workflows, tools, and RAG implementations**
+- **Write modular, testable, and clean code with proper documentation**
+- **Comment methods, use docstrings, and explain complex logic**
+- **Suggest best practices if current approach is outdated**
+- **Challenge vague requirements and identify edge cases immediately**
+
+### System Design
+
+- **Think beyond individual files - consider maintainability, usability, scalability**
+- **Design solutions rather than patching problems**
+- **Consider all system components (frontend, backend, database, user interface)**
+- **Plan for user experience, not just functionality**
+- **Identify environment variables, config files, and system dependencies**
+
+### Communication
+
+- **Be concise - provide essential information first, users will ask for more if needed**
+- **Ask only necessary clarifying questions - no fluff**
+- **Refine tasks until goals are bullet-proof**
+
+## Common Patterns
+
+### Agents
+
+- Use `@mastra/core/agent` for Agent class
+- Configure with `name`, `instructions`, `model`, and optional `tools`, `memory`, `evals`
+- Use `openai()` from `@ai-sdk/openai` for models
+- Enable memory with `@mastra/memory` and storage adapters
+
+### Workflows
+
+- Use `@mastra/core/workflows` for `createWorkflow` and `createStep`
+- Chain steps with `.then()`, `.parallel()`, `.branch()`, `.dowhile()`, `.dountil()`, `.foreach()`
+- Always call `.commit()` to finalize workflow definition
+- Use Zod schemas for input/output validation
+
+### Tools
+
+- Use `@mastra/core/tools` for `createTool`
+- Define `inputSchema` and `outputSchema` with Zod
+- Implement `execute` function with proper error handling
+- Support runtime context for dynamic behavior
+
+### RAG
+
+- Use `@mastra/rag` for document processing
+- Create embeddings with AI SDK providers
+- Store in supported vector databases (PgVector, Pinecone, Qdrant, etc.)
+- Use `createVectorQueryTool` for agent integration
+
+### MCP Integration
+
+- Use `@mastra/mcp` for MCPClient and MCPServer
+- Configure servers with proper command/args or URLs
+- Expose agents and workflows as MCP tools automatically
