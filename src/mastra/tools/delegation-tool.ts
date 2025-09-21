@@ -40,7 +40,6 @@ export const createDelegationTool = () => createTool({
         email: 'emailAgent',
         calendar: 'calendarAgent',
         webSearch: 'webSearchAgent',
-        weather: 'weatherAgent',
         project: 'projectAgent',
         analytics: 'analyticsAgent',
       };

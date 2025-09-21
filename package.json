@@ -11,6 +11,7 @@
     "test:main": "tsx src/test-main-agent.ts",
     "test:example": "tsx src/example-usage.ts",
     "test:delegation": "tsx src/test-delegation.ts",
+    "test:integration": "tsx src/test-integration.ts",
     "quick-start": "tsx src/quick-start.ts"
   },
   "keywords": [],

@@ -78,10 +78,12 @@ export class MessageSummarizer extends MemoryProcessor {
     
     messages.forEach(msg => {
       if (msg.role === 'user' || msg.role === 'assistant') {
-        const text = msg.content
-          .filter(part => part.type === 'text')
-          .map(part => (part as any).text)
-          .join(' ');
+        const text = Array.isArray(msg.content)
+          ? msg.content
+              .filter(part => part.type === 'text')
+              .map(part => (part as any).text)
+              .join(' ')
+          : msg.content;
         
         // Simple topic extraction (in production, use NLP)
         if (text.includes('email')) topics.add('email management');

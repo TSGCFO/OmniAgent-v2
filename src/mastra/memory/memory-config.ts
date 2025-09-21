@@ -1,8 +1,10 @@
 import { Memory } from '@mastra/memory';
-import { PgStore, PgVector } from '@mastra/pg';
+import { PostgresStore } from '@mastra/pg';
+import { PgVector } from '@mastra/pg';
 import { fastembed } from '@mastra/fastembed';
 import { getSystemConfig } from '../config/system-config.js';
 import { createUnifiedMemoryProcessors } from './memory-processors.js';
+import { parsePostgresUrl } from '../utils/parse-postgres-url.js';
 
 // Create a singleton memory instance for the unified agent system
 let memoryInstance: Memory | null = null;
@@ -56,15 +58,18 @@ export function createUnifiedMemory(): Memory {
   const config = getSystemConfig();
   
   // Create storage instances
-  const postgresUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;
+  const postgresUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || 'postgresql://localhost/postgres';
   if (!postgresUrl) {
-    throw new Error('POSTGRES_URL or DATABASE_URL environment variable is required');
+    console.warn('POSTGRES_URL or DATABASE_URL not set, using default: postgresql://localhost/postgres');
   }
   
-  const storage = new PgStore({
-    connectionString: postgresUrl,
-  });
+  // Parse the connection string into components
+  const dbConfig = parsePostgresUrl(postgresUrl);
   
+  // Use individual parameters for PostgresStore (as shown in Mastra examples)
+  const storage = new PostgresStore(dbConfig);
+  
+  // PgVector still uses connection string
   const vector = new PgVector({
     connectionString: postgresUrl,
   });

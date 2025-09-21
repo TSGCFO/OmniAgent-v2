@@ -1,6 +1,5 @@
 import { Tool } from '@mastra/core/tools';
 import { getMCPClient } from '../mcp/mcp-config.js';
-import { z } from 'zod';
 
 /**
  * Dynamically loads tools from MCP servers
@@ -15,34 +14,9 @@ export async function loadMCPTools(): Promise<Record<string, Tool>> {
   try {
     // Get all available tools from MCP servers
     const mcpTools = await mcpClient.getTools();
-    const tools: Record<string, Tool> = {};
-
-    // Convert MCP tools to Mastra tools
-    for (const [toolName, mcpTool] of Object.entries(mcpTools)) {
-      try {
-        // Create a Mastra tool wrapper for each MCP tool
-        tools[toolName] = {
-          id: toolName,
-          description: mcpTool.description || `MCP tool: ${toolName}`,
-          inputSchema: mcpTool.inputSchema || z.object({}),
-          outputSchema: mcpTool.outputSchema || z.any(),
-          execute: async ({ context }) => {
-            // Execute the tool through MCP
-            const result = await mcpClient.callTool({
-              server: mcpTool.server,
-              name: toolName,
-              arguments: context,
-            });
-            return result;
-          },
-        };
-      } catch (error) {
-        console.error(`Failed to load MCP tool ${toolName}:`, error);
-      }
-    }
-
-    console.log(`Loaded ${Object.keys(tools).length} tools from MCP servers`);
-    return tools;
+    
+    console.log(`Loaded ${Object.keys(mcpTools).length} tools from MCP servers`);
+    return mcpTools;
   } catch (error) {
     console.error('Failed to load MCP tools:', error);
     return {};

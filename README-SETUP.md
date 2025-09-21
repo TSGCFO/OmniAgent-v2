@@ -12,7 +12,7 @@ OmniAgent now uses a modern, scalable architecture:
 
 1. Node.js 20.9.0 or higher
 2. PostgreSQL 14 or higher
-3. Rube MCP account (sign up at https://rube.app)
+3. Rube MCP account (sign up at <https://rube.app>)
 
 ## Installation
 
@@ -32,12 +32,12 @@ Install PostgreSQL and create the database:
 # Connect to PostgreSQL
 psql -U postgres
 
-# Create database
-CREATE DATABASE omniagent;
+# The default 'postgres' database will be used
+# No need to create a new database
 
 # Create user (optional)
 CREATE USER omniagent_user WITH PASSWORD 'your-secure-password';
-GRANT ALL PRIVILEGES ON DATABASE omniagent TO omniagent_user;
+GRANT ALL PRIVILEGES ON DATABASE postgres TO omniagent_user;
 ```
 
 ### 3. Environment Configuration
@@ -50,7 +50,7 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 # Required: PostgreSQL Database URL
 # Format: postgresql://username:password@host:port/database
-POSTGRES_URL=postgresql://postgres:password@localhost:5432/omniagent
+POSTGRES_URL=postgresql://postgres:password@localhost:5432/postgres
 
 # Required: Rube MCP Server Token
 # Get your token from https://rube.app
@@ -107,26 +107,31 @@ npm run test:main
 The Rube MCP server provides access to 100+ pre-built integrations:
 
 ### Communication
+
 - Email (Gmail, Outlook, Yahoo, etc.)
 - Calendar (Google Calendar, Outlook Calendar, Apple Calendar)
 - Messaging (Slack, Teams, Discord, Telegram)
 
 ### Productivity
+
 - Project Management (Jira, Asana, Trello, Monday.com)
 - Document Management (Google Drive, Dropbox, OneDrive)
 - Note-taking (Notion, Evernote, OneNote)
 
 ### Development
+
 - GitHub, GitLab, Bitbucket
 - CI/CD (Jenkins, CircleCI, Travis CI)
 - Issue Tracking (Linear, Bugzilla)
 
 ### Business
+
 - CRM (Salesforce, HubSpot, Pipedrive)
 - Accounting (QuickBooks, Xero, FreshBooks)
 - E-commerce (Shopify, WooCommerce, Stripe)
 
 ### Social & Marketing
+
 - Social Media (Twitter, LinkedIn, Facebook)
 - Marketing (Mailchimp, SendGrid, ConvertKit)
 - Analytics (Google Analytics, Mixpanel)
@@ -134,21 +139,27 @@ The Rube MCP server provides access to 100+ pre-built integrations:
 ## Architecture Benefits
 
 ### 1. Scalable Storage
+
 PostgreSQL provides:
+
 - ACID compliance for data integrity
 - Advanced indexing for fast vector searches
 - Horizontal scalability options
 - Robust backup and recovery
 
 ### 2. Pre-built Integrations
+
 Rube MCP eliminates the need to:
+
 - Build custom API integrations
 - Handle OAuth flows
 - Maintain API version compatibility
 - Deal with rate limiting and retries
 
 ### 3. Dynamic Tool Discovery
+
 Agents automatically:
+
 - Discover available tools at runtime
 - Adapt to new integrations without code changes
 - Use the best tool for each task
@@ -159,12 +170,14 @@ Agents automatically:
 ### PostgreSQL Connection Issues
 
 1. Check if PostgreSQL is running:
+
    ```bash
    pg_isready
    ```
 
 2. Verify connection string format:
-   ```
+
+   ```text
    postgresql://[user[:password]@][host][:port][/dbname]
    ```
 
@@ -173,18 +186,20 @@ Agents automatically:
 ### MCP Connection Issues
 
 1. Verify your Rube token is valid
-2. Check network connectivity to https://rube.app/mcp
+2. Check network connectivity to <https://rube.app/mcp>
 3. Look for error messages in the console
 4. Ensure your token has necessary permissions
 
 ### Memory System Issues
 
 1. Check if tables were created:
+
    ```sql
    \dt
    ```
 
 2. Verify pgvector extension is installed:
+
    ```sql
    CREATE EXTENSION IF NOT EXISTS vector;
    ```
@@ -215,7 +230,7 @@ The system automatically creates necessary tables on first run. For manual migra
 
 ```bash
 # Connect to database
-psql -U postgres -d omniagent
+psql -U postgres -d postgres
 
 # Run migration scripts as needed
 ```
@@ -224,4 +239,4 @@ psql -U postgres -d omniagent
 
 - GitHub Issues: [Report issues here]
 - Documentation: See `/docs` folder
-- Rube MCP Docs: https://rube.app/docs
+- Rube MCP Docs: <https://rube.app/docs>

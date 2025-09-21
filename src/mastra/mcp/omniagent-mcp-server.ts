@@ -3,7 +3,6 @@ import { mainAgent } from '../agents/main-agent.js';
 import { emailAgent } from '../agents/email-agent.js';
 import { calendarAgent } from '../agents/calendar-agent.js';
 import { webSearchAgent } from '../agents/web-search-agent.js';
-import { weatherAgent } from '../agents/weather-agent.js';
 
 // Create MCP server to expose our unified agent system
 export const omniAgentMCPServer = new MCPServer({
@@ -20,7 +19,6 @@ export const omniAgentMCPServer = new MCPServer({
     emailAgent,
     calendarAgent,
     webSearchAgent,
-    weatherAgent,
   },
   
   // We can also expose specific tools if needed

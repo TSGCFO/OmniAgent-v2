@@ -125,9 +125,6 @@ export class AgentCoordinator {
       requiredAgents.add('webSearchAgent');
     }
     
-    if (lowerMessage.includes('weather') || lowerMessage.includes('forecast')) {
-      requiredAgents.add('weatherAgent');
-    }
     
     // Determine complexity
     const agentCount = requiredAgents.size;

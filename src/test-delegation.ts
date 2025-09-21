@@ -23,14 +23,9 @@ async function testDelegation() {
       expectedAgents: ['webSearchAgent', 'calendarAgent'],
     },
     {
-      name: 'Weather Delegation',
-      message: "What's the weather forecast for tomorrow in San Francisco?",
-      expectedAgents: ['weatherAgent'],
-    },
-    {
       name: 'Complex Coordination',
-      message: 'Check if I have any weather-related emails, and if so, reschedule any outdoor meetings',
-      expectedAgents: ['emailAgent', 'weatherAgent', 'calendarAgent'],
+      message: 'Check if I have any emails about the upcoming conference, and if so, schedule preparation meetings',
+      expectedAgents: ['emailAgent', 'calendarAgent'],
     },
   ];
   
