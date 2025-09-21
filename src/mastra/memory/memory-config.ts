@@ -88,7 +88,7 @@ export function createUnifiedMemory(): Memory {
       semanticRecall: config.memory.enableSemanticRecall ? {
         topK: config.memory.semanticRecallTopK,
         messageRange: config.memory.semanticRecallMessageRange,
-        scope: config.memory.workingMemoryScope as 'thread' | 'resource',
+        scope: (config.memory.semanticRecallScope || config.memory.workingMemoryScope) as 'thread' | 'resource',
       } : false,
       
       // Working memory configuration

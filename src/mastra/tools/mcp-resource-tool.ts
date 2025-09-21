@@ -209,7 +209,10 @@ export const searchMCPResourcesTool = createTool({
   inputSchema: z.object({
     searchTerm: z.string().describe('Term to search for in resource content'),
     mimeType: z.string().optional().describe('Filter by MIME type'),
-    maxResults: z.number().optional().default(10).describe('Maximum number of results to return')
+    maxResults: z.number().optional().default(10).describe('Maximum number of results to return'),
+    maxResourcesToScan: z.number().optional().default(100).describe('Upper bound on number of resources to read'),
+    serverFilter: z.string().optional().describe('Optional server name to filter before reading'),
+    minTextLength: z.number().optional().default(200).describe('Skip resources with content shorter than this after read'),
   }),
   outputSchema: z.object({
     results: z.array(z.object({
@@ -223,7 +226,7 @@ export const searchMCPResourcesTool = createTool({
     found: z.number()
   }),
   execute: async ({ context }) => {
-    const { searchTerm, mimeType, maxResults } = context;
+    const { searchTerm, mimeType, maxResults, maxResourcesToScan, serverFilter, minTextLength } = context;
     
     // First, get all resources
     const allResources = await getMCPResources();
@@ -231,6 +234,7 @@ export const searchMCPResourcesTool = createTool({
     let searched = 0;
     
     for (const [serverName, resources] of Object.entries(allResources)) {
+      if (serverFilter && serverName !== serverFilter) continue;
       if (!Array.isArray(resources)) continue;
       
       for (const resource of resources) {
@@ -246,6 +250,11 @@ export const searchMCPResourcesTool = createTool({
           continue;
         }
         
+        // honor scan cap
+        if (searched >= (maxResourcesToScan ?? 100)) {
+          break;
+        }
+
         searched++;
         
         try {
@@ -255,6 +264,9 @@ export const searchMCPResourcesTool = createTool({
           
           // Search for the term (case-insensitive)
           if (text.toLowerCase().includes(searchTerm.toLowerCase())) {
+            if (minTextLength && text.length < minTextLength) {
+              continue;
+            }
             // Find the excerpt around the search term
             const index = text.toLowerCase().indexOf(searchTerm.toLowerCase());
             const start = Math.max(0, index - 50);

@@ -36,15 +36,26 @@ export const intelligentMCPHelperTool = createTool({
     shouldUseResources: z.boolean(),
     shouldUsePrompts: z.boolean()
   }),
-  execute: async ({ context }) => {
+  execute: async ({ context, runtimeContext }) => {
     const { userQuery, queryType } = context;
     
     // Extract keywords from the query
     const keywords = extractKeywords(userQuery);
     
-    // Get all available resources and prompts
-    const allResources = await getMCPResources();
-    const allPrompts = await getMCPPrompts();
+    // Short-lived cache per invocation (runtimeContext scoped)
+    const cacheKeyRes = '__mcp_list_cache_resources__';
+    const cacheKeyPr = '__mcp_list_cache_prompts__';
+    let allResources: any = runtimeContext?.get(cacheKeyRes);
+    let allPrompts: any = runtimeContext?.get(cacheKeyPr);
+
+    if (!allResources) {
+      allResources = await getMCPResources();
+      runtimeContext?.set(cacheKeyRes, allResources);
+    }
+    if (!allPrompts) {
+      allPrompts = await getMCPPrompts();
+      runtimeContext?.set(cacheKeyPr, allPrompts);
+    }
     
     // Find relevant resources
     const relevantResources: Array<{

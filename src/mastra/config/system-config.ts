@@ -5,6 +5,7 @@ export const SystemConfigSchema = z.object({
   // Memory settings
   memory: z.object({
     workingMemoryScope: z.enum(['thread', 'resource']).default('resource'),
+    semanticRecallScope: z.enum(['thread', 'resource']).default('resource'),
     semanticRecallTopK: z.number().min(1).max(20).default(5),
     semanticRecallMessageRange: z.number().min(0).max(10).default(2),
     lastMessagesCount: z.number().min(5).max(100).default(20),
@@ -34,6 +35,7 @@ export type SystemConfig = z.infer<typeof SystemConfigSchema>;
 export const defaultConfig: SystemConfig = {
   memory: {
     workingMemoryScope: 'resource',
+    semanticRecallScope: 'resource',
     semanticRecallTopK: 5,
     semanticRecallMessageRange: 2,
     lastMessagesCount: 20,
@@ -58,6 +60,7 @@ export function getSystemConfig(): SystemConfig {
   return SystemConfigSchema.parse({
     memory: {
       workingMemoryScope: process.env.MEMORY_WORKING_SCOPE || defaultConfig.memory.workingMemoryScope,
+      semanticRecallScope: process.env.MEMORY_SEMANTIC_RECALL_SCOPE || defaultConfig.memory.semanticRecallScope,
       semanticRecallTopK: process.env.MEMORY_SEMANTIC_RECALL_TOPK 
         ? parseInt(process.env.MEMORY_SEMANTIC_RECALL_TOPK) 
         : defaultConfig.memory.semanticRecallTopK,
