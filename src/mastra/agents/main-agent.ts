@@ -130,10 +130,12 @@ export const mainAgent = new Agent({
       const { emailAgent } = await import('./email-agent.js');
       const { calendarAgent } = await import('./calendar-agent.js');
       const { webSearchAgent } = await import('./web-search-agent.js');
+      const { codingAgent } = await import('./coding-agent.js');
       
       agents.emailAgent = emailAgent;
       agents.calendarAgent = calendarAgent;
       agents.webSearchAgent = webSearchAgent;
+      agents.codingAgent = codingAgent;
       
       // Phase 2 agents can be added here when available
       // if (config.features.enableProjectManagement) {

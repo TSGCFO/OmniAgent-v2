@@ -3,7 +3,7 @@ import { openai } from '@ai-sdk/openai';
 import { RuntimeContext } from '@mastra/core/runtime-context';
 import { getUnifiedMemory } from '../memory/memory-config.js';
 import { getSystemConfig } from '../config/system-config.js';
-import { createDynamicToolLoader } from '../tools/mcp-tool-loader.js';
+import { getMCPToolsForDomain } from '../tools/mcp-tool-loader.js';
 
 const WEB_SEARCH_AGENT_INSTRUCTIONS = `You are the Web Search Agent, a specialized assistant for finding, analyzing, and synthesizing information from the internet.
 
@@ -57,7 +57,18 @@ export const webSearchAgent = new Agent({
     return openai(model as Parameters<typeof openai>[0]);
   },
   memory: getUnifiedMemory(),
-  tools: createDynamicToolLoader('web'),
+  tools: async () => {
+    const mcpWebTools = await getMCPToolsForDomain('web');
+    return {
+      // OpenAI built-in web search tool configuration
+      web_search: {
+        searchContextSize: 'high',
+        userLocation: { type: 'automatic' }
+      },
+      // Merge domain MCP tools
+      ...mcpWebTools,
+    } as any;
+  },
   defaultGenerateOptions: ({ runtimeContext }) => {
     const config = getSystemConfig();
     return {
